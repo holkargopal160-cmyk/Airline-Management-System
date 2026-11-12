@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_CRED = 'dockerhub-credentials-id'
+        IMAGE_NAME = 'your-dockerhub-username/airline-app'
+        SONAR_HOST = 'http://localhost:9000'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-username/airline-management.git'
+            }
+        }
+
+        stage('SonarQube Code Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube-Server') {
+                        sh 'sonar-scanner'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ./airline_app"
+                    sh "docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_HUB_CRED}", usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                        sh "docker push ${IMAGE_NAME}:${BUILD_NUMBER}"
+                        sh "docker push ${IMAGE_NAME}:latest"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy via Ansible') {
+            steps {
+                script {
+                    sh "ansible-playbook -i ansible/inventory.ini ansible/deploy.yml"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker logout'
+        }
+    }
+}

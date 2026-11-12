@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyStream Airlines - Executive Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-100 font-sans antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black custom-scrollbar">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-plane-departure text-white text-xl transform -rotate-12"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-blue-400 bg-clip-text text-transparent">SkyStream</span>
+                        <span class="text-xs uppercase tracking-widest font-semibold text-blue-400 block -mt-1">Airlines Ops</span>
+                    </div>
+                </div>
+
+                <!-- Ticker Metrics -->
+                <div class="hidden lg:flex items-center space-x-6 bg-slate-900/60 py-2 px-5 rounded-full border border-slate-800">
+                    <div class="flex items-center space-x-2">
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-xs font-medium text-slate-400">System Status:</span>
+                        <span class="text-xs font-semibold text-emerald-400">Prometheus Linked</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-800"></div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-plane text-xs text-blue-400"></i>
+                        <span class="text-xs font-medium text-slate-400">Active Flights:</span>
+                        <span class="text-xs font-bold text-white">{{ flights|length }}</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-800"></div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-server text-xs text-indigo-400"></i>
+                        <span class="text-xs font-medium text-slate-400">Latency:</span>
+                        <span class="text-xs font-bold text-indigo-300">12ms</span>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="openBookingModal()" class="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/25 transition duration-200">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Book Passenger</span>
+                    </button>
+                    
+                    <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer transition">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Dashboard Metrics -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Scheduled</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">{{ flights|length }} Flights</h3>
+                    <p class="text-xs text-emerald-400 mt-1 flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i> Live Database</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                    <i class="fa-solid fa-plane-flight text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Bookings</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">Active</h3>
+                    <p class="text-xs text-emerald-400 mt-1 flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i> Real-time sync</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <i class="fa-solid fa-ticket text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Server Load (Grafana)</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">24.2 %</h3>
+                    <p class="text-xs text-slate-400 mt-1 flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Normal operations</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                    <i class="fa-solid fa-chart-line text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">PostgreSQL Status</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 mt-1">Connected</h3>
+                    <p class="text-xs text-slate-400 mt-1 flex items-center"><i class="fa-solid fa-database text-blue-400 mr-1"></i> db:5432 (airlinedb)</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-server text-xl"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search & Filter Controls -->
+        <section class="glass-card p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Flight Management Portal</h2>
+                    <p class="text-xs text-slate-400">Filter, monitor, and execute customer seat bookings in real time</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="filterStatus('ALL')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">All Flights</button>
+                    <button onclick="filterStatus('On Time')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">On Time</button>
+                    <button onclick="filterStatus('Boarding')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">Boarding</button>
+                    <button onclick="filterStatus('Delayed')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">Delayed</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search Flight No. or City..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-500">
+                </div>
+                <div>
+                    <select id="origin-filter" onchange="handleSearch()" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option value="">All Origins</option>
+                        {% for origin in origins %}
+                        <option value="{{ origin }}">{{ origin }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <select id="dest-filter" onchange="handleSearch()" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option value="">All Destinations</option>
+                        {% for dest in destinations %}
+                        <option value="{{ dest }}">{{ dest }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <button onclick="resetFilters()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                        <span>Reset Filters</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Flight List Table -->
+        <section class="glass-card rounded-2xl overflow-hidden border border-slate-800/80">
+            <div class="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-slate-300 flex items-center">
+                    <i class="fa-solid fa-list text-blue-400 mr-2"></i> Live Available Schedules
+                </h3>
+                <span class="text-xs text-slate-500">Connected to PostgreSQL (airlinedb)</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 font-medium tracking-wider">
+                        <tr>
+                            <th class="py-4 px-6">Flight No</th>
+                            <th class="py-4 px-6">Route</th>
+                            <th class="py-4 px-6">Departure Time</th>
+                            <th class="py-4 px-6">Seats Left</th>
+                            <th class="py-4 px-6">Fare</th>
+                            <th class="py-4 px-6">Status</th>
+                            <th class="py-4 px-6 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flights-table-body" class="divide-y divide-slate-800/50 font-normal">
+                        {% for flight in flights %}
+                        <tr class="flight-row hover:bg-slate-900/50 transition duration-150" data-status="{{ flight.status }}">
+                            <td class="py-4 px-6 font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-plane-up text-blue-500 text-xs"></i>
+                                <span class="flight-num">{{ flight.flight_number }}</span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center space-x-2 text-xs">
+                                    <span class="font-medium text-slate-200 flight-source">{{ flight.source }}</span>
+                                    <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                                    <span class="font-medium text-slate-200 flight-dest">{{ flight.destination }}</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-xs text-slate-400">{{ flight.departure_time|date:"Y-m-d H:i" }}</td>
+                            <td class="py-4 px-6 text-xs">
+                                {% if flight.available_seats <= 5 %}
+                                <span class="text-rose-400 font-bold">{{ flight.available_seats }} left!</span>
+                                {% else %}
+                                <span class="text-slate-300">{{ flight.available_seats }} seats</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-6 font-bold text-white">${{ flight.price }}</td>
+                            <td class="py-4 px-6">
+                                {% if flight.status == 'On Time' %}
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">On Time</span>
+                                {% elif flight.status == 'Boarding' %}
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 animate-pulse">Boarding</span>
+                                {% else %}
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Delayed</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <button onclick="openBookingModal('{{ flight.id }}', '{{ flight.flight_number }}', '{{ flight.source }}', '{{ flight.destination }}', '{{ flight.price }}')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 font-medium text-xs px-3.5 py-1.5 rounded-lg transition duration-200">
+                                    Book Now
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-slate-500 font-medium">
+                                No flights available right now. Please add flights via Django Admin.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Booking Modal (Connected to Django POST view) -->
+    <div id="booking-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-lg rounded-2xl shadow-2xl border border-slate-800 p-6 relative animate-in fade-in duration-200">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Book Flight Ticket</h3>
+                        <p class="text-xs text-slate-400">SkyStream Passenger Reservation Engine</p>
+                    </div>
+                </div>
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-white p-1 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form (Submits to Django View) -->
+            <form method="POST" class="mt-5 space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Select Flight</label>
+                    <select name="flight_id" id="modal-flight-select" onchange="updatePriceSummary()" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        {% for flight in flights %}
+                        <option value="{{ flight.id }}" data-price="{{ flight.price }}">
+                            {{ flight.flight_number }} - {{ flight.source }} to {{ flight.destination }} (${{ flight.price }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Passenger Name</label>
+                        <input type="text" name="name" placeholder="Gopal Holkar" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+                        <input type="email" name="email" placeholder="gopal@example.com" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Seat Number</label>
+                        <input type="text" name="seat" placeholder="12A" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Cabin Class</label>
+                        <select id="cabin-class" onchange="updatePriceSummary()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            <option value="1">Economy Class</option>
+                            <option value="1.8">Business Class (+80%)</option>
+                            <option value="2.5">First Class (+150%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Price Summary Box -->
+                <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Total Fare Estimate</span>
+                        <span class="text-xs text-emerald-400">Includes all taxes & security fees</span>
+                    </div>
+                    <span id="price-summary" class="text-xl font-extrabold text-white">$0.00</span>
+                </div>
+
+                <div class="flex items-center space-x-3 pt-3">
+                    <button type="button" onclick="closeBookingModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-xl text-sm transition">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-500/25">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let activeStatusFilter = 'ALL';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePriceSummary();
+        });
+
+        // Filter Logic
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const origin = document.getElementById('origin-filter').value;
+            const dest = document.getElementById('dest-filter').value;
+            const rows = document.querySelectorAll('.flight-row');
+
+            rows.forEach(row => {
+                const flightNum = row.querySelector('.flight-num').innerText.toLowerCase();
+                const source = row.querySelector('.flight-source').innerText;
+                const destination = row.querySelector('.flight-dest').innerText;
+                const status = row.getAttribute('data-status');
+
+                const matchesQuery = flightNum.includes(query) || source.toLowerCase().includes(query) || destination.toLowerCase().includes(query);
+                const matchesOrigin = origin === "" || source === origin;
+                const matchesDest = dest === "" || destination === dest;
+                const matchesStatus = activeStatusFilter === 'ALL' || status === activeStatusFilter;
+
+                if (matchesQuery && matchesOrigin && matchesDest && matchesStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        function filterStatus(status) {
+            activeStatusFilter = status;
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                if (btn.innerText.toUpperCase().includes(status.toUpperCase()) || (status === 'ALL' && btn.innerText.includes('All'))) {
+                    btn.className = "status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition";
+                } else {
+                    btn.className = "status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition";
+                }
+            });
+            handleSearch();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('origin-filter').value = '';
+            document.getElementById('dest-filter').value = '';
+            filterStatus('ALL');
+        }
+
+        // Modal Handling
+        function openBookingModal(flightId = null) {
+            if(flightId) {
+                document.getElementById('modal-flight-select').value = flightId;
+            }
+            updatePriceSummary();
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function updatePriceSummary() {
+            const select = document.getElementById('modal-flight-select');
+            const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption) return;
+            
+            const basePrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            const multiplier = parseFloat(document.getElementById('cabin-class').value) || 1;
+            
+            const total = (basePrice * multiplier).toFixed(2);
+            document.getElementById('price-summary').innerText = `$${total}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: airline_db
+    environment:
+      POSTGRES_DB: airlinedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: ./airline_app
+      dockerfile: Dockerfile
+    container_name: airline_django_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./airline_app:/app
+    ports:
+      - "8083:8000"
+    environment:
+      - DEBUG=1
+    depends_on:
+      - db
+      - prometheus
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: airline_prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: airline_grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:

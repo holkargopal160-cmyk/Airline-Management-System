@@ -1,0 +1,24 @@
+---
+- name: Deploy Airline Management System Container
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Pull Latest Docker Image
+      community.docker.docker_image:
+        name: your-dockerhub-username/airline-app
+        tag: latest
+        source: pull
+
+    - name: Run Django Application Container
+      community.docker.docker_container:
+        name: airline_web_prod
+        image: your-dockerhub-username/airline-app:latest
+        state: started
+        recreate: yes
+        ports:
+          - "8000:8000"
+        env:
+          POSTGRES_DB: "airlinedb"
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgrespassword"
+          POSTGRES_HOST: "db-prod-ip"

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Airline Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        h1 { color: #2c3e50; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #2980b9; color: white; }
+        .form-card { background: white; padding: 20px; margin-top: 20px; border-radius: 5px; width: 400px; }
+        input, select, button { width: 100%; padding: 10px; margin: 8px 0; }
+        button { background-color: #27ae60; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>SkyStream Airline Management System</h1>
+    
+    <h2>Available Flights</h2>
+    <table>
+        <tr>
+            <th>Flight No</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Departure</th>
+            <th>Seats Left</th>
+            <th>Price</th>
+        </tr>
+        {% for flight in flights %}
+        <tr>
+            <td>{{ flight.flight_number }}</td>
+            <td>{{ flight.source }}</td>
+            <td>{{ flight.destination }}</td>
+            <td>{{ flight.departure_time }}</td>
+            <td>{{ flight.available_seats }}</td>
+            <td>${{ flight.price }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No flights available right now.</td></tr>
+        {% endfor %}
+    </table>
+
+    <div class="form-card">
+        <h3>Book a Ticket</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Select Flight:</label>
+            <select name="flight_id" required>
+                {% for flight in flights %}
+                <option value="{{ flight.id }}">{{ flight.flight_number }} ({{ flight.source }} to {{ flight.destination }})</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="name" placeholder="Passenger Full Name" required>
+            <input type="email" name="email" placeholder="Email Address" required>
+            <input type="text" name="seat" placeholder="Seat Preference (e.g. 12A)" required>
+            <button type="submit">Book Flight</button>
+        </form>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyStream Airlines - Executive Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 9999px;
+        }
+        .pulse-glow {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-100 font-sans antialiased bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black custom-scrollbar">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-plane-departure text-white text-xl transform -rotate-12"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-blue-400 bg-clip-text text-transparent">SkyStream</span>
+                        <span class="text-xs uppercase tracking-widest font-semibold text-blue-400 block -mt-1">Airlines Ops</span>
+                    </div>
+                </div>
+
+                <!-- Ticker Metrics (Django/Prometheus Dynamic View) -->
+                <div class="hidden lg:flex items-center space-x-6 bg-slate-900/60 py-2 px-5 rounded-full border border-slate-800">
+                    <div class="flex items-center space-x-2">
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-xs font-medium text-slate-400">System Status:</span>
+                        <span class="text-xs font-semibold text-emerald-400">Prometheus Linked</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-800"></div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-plane text-xs text-blue-400"></i>
+                        <span class="text-xs font-medium text-slate-400">Active Flights:</span>
+                        <span class="text-xs font-bold text-white" id="stat-active-flights">14</span>
+                    </div>
+                    <div class="h-3 w-px bg-slate-800"></div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-server text-xs text-indigo-400"></i>
+                        <span class="text-xs font-medium text-slate-400">Latency:</span>
+                        <span class="text-xs font-bold text-indigo-300">12ms</span>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex items-center space-x-4">
+                    <button id="quick-add-btn" onclick="openBookingModal()" class="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/25 transition duration-200">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Book Passenger</span>
+                    </button>
+                    
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white cursor-pointer transition">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Banner & Performance Dashboard Metrics -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Scheduled</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="kpi-scheduled">28 Flights</h3>
+                    <p class="text-xs text-emerald-400 mt-1 flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i> +12% from yesterday</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                    <i class="fa-solid fa-plane-flight text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Bookings</p>
+                    <h3 class="text-2xl font-bold text-white mt-1" id="kpi-bookings">1,420</h3>
+                    <p class="text-xs text-emerald-400 mt-1 flex items-center"><i class="fa-solid fa-arrow-up mr-1"></i> +8.4% capacity</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <i class="fa-solid fa-ticket text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Server Load (Grafana)</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">24.2 %</h3>
+                    <p class="text-xs text-slate-400 mt-1 flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Normal operations</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                    <i class="fa-solid fa-chart-line text-xl"></i>
+                </div>
+            </div>
+
+            <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">PostgreSQL Status</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 mt-1">Connected</h3>
+                    <p class="text-xs text-slate-400 mt-1 flex items-center"><i class="fa-solid fa-database text-blue-400 mr-1"></i> db:5432 (airlinedb)</p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-server text-xl"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Advanced Search & Filter Controls -->
+        <section class="glass-card p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+                <div>
+                    <h2 class="text-lg font-bold text-white">Flight Management Portal</h2>
+                    <p class="text-xs text-slate-400">Filter, monitor, and execute customer seat bookings in real time</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="filterStatus('ALL')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">All Flights</button>
+                    <button onclick="filterStatus('ON TIME')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">On Time</button>
+                    <button onclick="filterStatus('BOARDING')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">Boarding</button>
+                    <button onclick="filterStatus('DELAYED')" class="status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">Delayed</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search Flight No. or City..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-500">
+                </div>
+                <div>
+                    <select id="origin-filter" onchange="handleSearch()" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option value="">All Origins</option>
+                        <option value="New York (JFK)">New York (JFK)</option>
+                        <option value="London (LHR)">London (LHR)</option>
+                        <option value="Tokyo (HND)">Tokyo (HND)</option>
+                        <option value="Dubai (DXB)">Dubai (DXB)</option>
+                        <option value="Mumbai (BOM)">Mumbai (BOM)</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="dest-filter" onchange="handleSearch()" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-blue-500">
+                        <option value="">All Destinations</option>
+                        <option value="Paris (CDG)">Paris (CDG)</option>
+                        <option value="Singapore (SIN)">Singapore (SIN)</option>
+                        <option value="San Francisco (SFO)">San Francisco (SFO)</option>
+                        <option value="Frankfurt (FRA)">Frankfurt (FRA)</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="resetFilters()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                        <span>Reset Filters</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Flight List Table -->
+        <section class="glass-card rounded-2xl overflow-hidden border border-slate-800/80">
+            <div class="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-slate-300 flex items-center">
+                    <i class="fa-solid fa-list text-blue-400 mr-2"></i> Live Available Schedules
+                </h3>
+                <span class="text-xs text-slate-500">Showing dynamically from Django Backend Context</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 font-medium tracking-wider">
+                        <tr>
+                            <th class="py-4 px-6">Flight No</th>
+                            <th class="py-4 px-6">Route</th>
+                            <th class="py-4 px-6">Departure Time</th>
+                            <th class="py-4 px-6">Seats Left</th>
+                            <th class="py-4 px-6">Fare</th>
+                            <th class="py-4 px-6">Status</th>
+                            <th class="py-4 px-6 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flights-table-body" class="divide-y divide-slate-800/50 font-normal">
+                        <!-- Populated by JavaScript Mock Data (Representing Django Django Context Models) -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-lg rounded-2xl shadow-2xl border border-slate-800 p-6 relative animate-in fade-in duration-200">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-600/20 text-blue-400 flex items-center justify-center">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Book Flight Ticket</h3>
+                        <p class="text-xs text-slate-400">SkyStream Passenger Reservation Engine</p>
+                    </div>
+                </div>
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-white p-1 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <form id="booking-form" onsubmit="handleBookingSubmit(event)" class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Select Flight</label>
+                    <select id="modal-flight-select" onchange="updatePriceSummary()" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <!-- Options populated via JS -->
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Passenger Name</label>
+                        <input type="text" id="passenger-name" placeholder="Gopal Holkar" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+                        <input type="email" id="passenger-email" placeholder="gopal@example.com" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 placeholder-slate-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Class</label>
+                        <select id="cabin-class" onchange="updatePriceSummary()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                            <option value="1">Economy Class</option>
+                            <option value="1.8">Business Class (+80%)</option>
+                            <option value="2.5">First Class (+150%)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Number of Passengers</label>
+                        <input type="number" id="ticket-count" min="1" max="5" value="1" onchange="updatePriceSummary()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Price Summary Box -->
+                <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Total Fare Estimate</span>
+                        <span class="text-xs text-emerald-400">Includes all taxes & security fees</span>
+                    </div>
+                    <span id="price-summary" class="text-xl font-extrabold text-white">$450.00</span>
+                </div>
+
+                <div class="flex items-center space-x-3 pt-3">
+                    <button type="button" onclick="closeBookingModal()" class="w-1/2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-xl text-sm transition">Cancel</button>
+                    <button type="submit" class="w-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-2.5 rounded-xl text-sm transition shadow-lg shadow-blue-500/25">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-3 pointer-events-none"></div>
+
+    <script>
+        // Sample Initial Flights Data (Simulating Django ORM context data)
+        const flightsData = [
+            { id: 1, flight_number: "SK-204", source: "New York (JFK)", destination: "London (LHR)", departure_time: "14:30 EST", available_seats: 12, price: 540, status: "ON TIME" },
+            { id: 2, flight_number: "SK-809", source: "Tokyo (HND)", destination: "San Francisco (SFO)", departure_time: "18:15 JST", available_seats: 4, price: 890, status: "BOARDING" },
+            { id: 3, flight_number: "SK-112", source: "Dubai (DXB)", destination: "Paris (CDG)", departure_time: "21:00 GST", available_seats: 45, price: 410, status: "ON TIME" },
+            { id: 4, flight_number: "SK-505", source: "Mumbai (BOM)", destination: "Singapore (SIN)", departure_time: "04:45 IST", available_seats: 2, price: 320, status: "DELAYED" },
+            { id: 5, flight_number: "SK-991", source: "London (LHR)", destination: "Frankfurt (FRA)", departure_time: "11:20 GMT", available_seats: 28, price: 210, status: "ON TIME" }
+        ];
+
+        let activeStatusFilter = 'ALL';
+
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable(flightsData);
+            populateFlightDropdown();
+        });
+
+        // Render Flight Rows
+        function renderTable(data) {
+            const tbody = document.getElementById('flights-table-body');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-slate-500 font-medium">
+                            No flights match your search criteria.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            data.forEach(flight => {
+                // Status Color Badges
+                let statusBadge = '';
+                if(flight.status === 'ON TIME') {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">On Time</span>`;
+                } else if(flight.status === 'BOARDING') {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 animate-pulse">Boarding</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Delayed</span>`;
+                }
+
+                // Seat Warning Colors
+                let seatBadge = flight.available_seats <= 5 
+                    ? `<span class="text-rose-400 font-bold">${flight.available_seats} left!</span>` 
+                    : `<span class="text-slate-300">${flight.available_seats} seats</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/50 transition duration-150";
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-plane-up text-blue-500 text-xs"></i>
+                        <span>${flight.flight_number}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="font-medium text-slate-200">${flight.source}</span>
+                            <i class="fa-solid fa-arrow-right text-slate-600"></i>
+                            <span class="font-medium text-slate-200">${flight.destination}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-xs text-slate-400">${flight.departure_time}</td>
+                    <td class="py-4 px-6 text-xs">${seatBadge}</td>
+                    <td class="py-4 px-6 font-bold text-white">$${flight.price}</td>
+                    <td class="py-4 px-6">${statusBadge}</td>
+                    <td class="py-4 px-6 text-right">
+                        <button onclick="openBookingModal(${flight.id})" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-500/30 font-medium text-xs px-3.5 py-1.5 rounded-lg transition duration-200">
+                            Book Now
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filtering Logic
+        function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const origin = document.getElementById('origin-filter').value;
+            const dest = document.getElementById('dest-filter').value;
+
+            const filtered = flightsData.filter(flight => {
+                const matchesQuery = flight.flight_number.toLowerCase().includes(query) ||
+                                     flight.source.toLowerCase().includes(query) ||
+                                     flight.destination.toLowerCase().includes(query);
+                const matchesOrigin = origin === "" || flight.source === origin;
+                const matchesDest = dest === "" || flight.destination === dest;
+                const matchesStatus = activeStatusFilter === 'ALL' || flight.status === activeStatusFilter;
+
+                return matchesQuery && matchesOrigin && matchesDest && matchesStatus;
+            });
+
+            renderTable(filtered);
+        }
+
+        function filterStatus(status) {
+            activeStatusFilter = status;
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                if (btn.innerText.toUpperCase().includes(status)) {
+                    btn.className = "status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition";
+                } else {
+                    btn.className = "status-tab px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition";
+                }
+            });
+            handleSearch();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('origin-filter').value = '';
+            document.getElementById('dest-filter').value = '';
+            filterStatus('ALL');
+        }
+
+        // Modal Handling & Dynamic Calculation
+        function populateFlightDropdown() {
+            const select = document.getElementById('modal-flight-select');
+            select.innerHTML = '';
+            flightsData.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.innerText = `${f.flight_number} - ${f.source} to ${f.destination} ($${f.price})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function openBookingModal(flightId = null) {
+            if(flightId) {
+                document.getElementById('modal-flight-select').value = flightId;
+            }
+            updatePriceSummary();
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function updatePriceSummary() {
+            const flightId = document.getElementById('modal-flight-select').value;
+            const flight = flightsData.find(f => f.id == flightId);
+            const multiplier = parseFloat(document.getElementById('cabin-class').value);
+            const count = parseInt(document.getElementById('ticket-count').value) || 1;
+
+            if (flight) {
+                const total = (flight.price * multiplier * count).toFixed(2);
+                document.getElementById('price-summary').innerText = `$${total}`;
+            }
+        }
+
+        function handleBookingSubmit(event) {
+            event.preventDefault();
+            const flightId = document.getElementById('modal-flight-select').value;
+            const flight = flightsData.find(f => f.id == flightId);
+            const name = document.getElementById('passenger-name').value;
+
+            if (flight && flight.available_seats > 0) {
+                flight.available_seats -= 1; // Decrement local seats
+                renderTable(flightsData);
+                closeBookingModal();
+
+                showToast(`Ticket successfully booked for ${name} on ${flight.flight_number}!`, 'success');
+                
+                // Update total bookings KPI count visually
+                const bookingKpi = document.getElementById('kpi-bookings');
+                bookingKpi.innerText = (parseInt(bookingKpi.innerText.replace(/,/g, '')) + 1).toLocaleString();
+            } else {
+                showToast(`Selected flight has no available seats left.`, 'error');
+            }
+        }
+
+        // Toast Feedback System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const isSuccess = type === 'success';
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-xl border text-sm font-medium shadow-xl transition transform duration-300 translate-y-2 ${
+                isSuccess 
+                ? 'bg-slate-900 border-emerald-500/40 text-emerald-300' 
+                : 'bg-slate-900 border-rose-500/40 text-rose-300'
+            }`;
+
+            toast.innerHTML = `
+                <i class="fa-solid ${isSuccess ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-rose-400'} text-base"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
