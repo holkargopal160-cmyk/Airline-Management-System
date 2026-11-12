@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         DOCKER_HUB_CRED = 'dockerhub-credentials-id'
-        IMAGE_NAME = 'your-dockerhub-username/airline-app'
+        IMAGE_NAME = 'your-dockerhub-holkargopal160/airline-app'
         SONAR_HOST = 'http://localhost:9000'
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/airline-management.git'
+                git branch: 'main', url: 'https://github.com/holkargopal160-cmyk/Airline-Management-System.git'
             }
         }
 
