@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Flight, Booking
 
 def index(request):
@@ -17,7 +17,7 @@ def index(request):
         try:
             flight = Flight.objects.get(id=flight_id)
             if flight.available_seats > 0:
-                Booking.objects.create(
+                booking = Booking.objects.create(
                     passenger_name=name,
                     passenger_email=email,
                     flight=flight,
@@ -25,6 +25,10 @@ def index(request):
                 )
                 flight.available_seats -= 1
                 flight.save()
+                
+                # Booking complete hote hi user ko direct ticket receipt page par redirect karein
+                return redirect('ticket_view', booking_id=booking.id)
+                
         except Flight.DoesNotExist:
             pass
             
@@ -37,3 +41,11 @@ def index(request):
     }
     
     return render(request, 'core/index.html', context)
+
+
+def ticket_view(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    context = {
+        'booking': booking,
+    }
+    return render(request, 'core/ticket.html', context)
